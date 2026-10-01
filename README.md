@@ -7,8 +7,8 @@ A cinematic Allu Arjun fan site with an animated 3D AA signature, scroll-driven 
 Requires Node.js 22.13 or newer and pnpm 11.25.
 
 ```sh
-git clone https://github.com/gireeshkumarreddy/alluarjun.git
-cd alluarjun
+git clone https://github.com/sakshamfit/AA.git
+cd AA
 npm install --global pnpm@11.25.0
 pnpm install --frozen-lockfile
 pnpm dev
@@ -22,11 +22,13 @@ pnpm build
 pnpm start
 ```
 
-The production build targets a Cloudflare-compatible Worker. This repository contains the complete source, 3D geometry, styles, all 13 project images and all 9 local MP4 clips, including additional Pushpa footage. No Git LFS setup or separate asset download is needed. Dependencies and generated build caches are rebuilt from the source and lockfile.
+Every component is a client component and there are no API routes or server actions, so the production build pre-renders the entire site into static files in `dist/client`. That output can be hosted anywhere, Vercel included. The build also still emits the Cloudflare Worker files in `dist/server`.
+
+This repository contains the complete source, 3D geometry, styles, all 13 project images and all 9 local MP4 clips, including additional Pushpa footage. No Git LFS setup or separate asset download is needed. Dependencies and generated build caches are rebuilt from the source and lockfile.
 
 ## Deploy
 
-See [DEPLOYMENT.md](DEPLOYMENT.md) for GitHub-connected Cloudflare deployment. No API keys or database are required by the website itself.
+See [DEPLOYMENT.md](DEPLOYMENT.md). Vercel is configured out of the box through `vercel.json`: build with `pnpm build`, output directory `dist/client`. Cloudflare Workers deployment is documented there too. No API keys or database are required by the website itself.
 
 After signing in to your Cloudflare account:
 

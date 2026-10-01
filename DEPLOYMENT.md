@@ -1,13 +1,52 @@
 # Deployment
 
-The current application uses React, Vinext/Vite and Three.js. It builds to a Cloudflare-compatible Worker and a static asset directory. Deploy the generated Worker configuration together with its assets.
+The application uses React, Vinext/Vite and Three.js. Every component is a client
+component, there are no API routes or server actions, so the production build
+pre-renders the whole site to static files in `dist/client`. That static output is
+what you deploy, and it works on any static host — Vercel included.
 
-## Cloudflare Workers connected to GitHub
+## Vercel (recommended, already configured)
 
-1. In your Cloudflare account, create a Worker using the GitHub repository `gireeshkumarreddy/alluarjun`.
+`vercel.json` in the repository root pins everything Vercel needs:
+
+| Setting | Value |
+| --- | --- |
+| Framework preset | `null` (do **not** let Vercel auto-detect Next.js or Vite) |
+| Install command | `pnpm install --frozen-lockfile` |
+| Build command | `pnpm build` |
+| Output directory | `dist/client` |
+
+### Why the framework preset is disabled
+
+This project is not built by `next build` and it is not a plain `vite build` either.
+It is built by Vite/Vinext through `scripts/run-framework.mjs`, which writes the
+pre-rendered site to `dist/client`. If Vercel auto-detects the preset it looks for
+`dist/index.html`, finds nothing there, and serves **404 NOT_FOUND**. Disabling
+auto-detection and setting the output directory explicitly is what fixes that.
+
+### Deploy
+
+1. In Vercel, import the GitHub repository `sakshamfit/AA`.
+2. Leave **Root Directory** as the repository root.
+3. Leave **Production Branch** as `main`.
+4. Do not override the build settings — `vercel.json` supplies them.
+5. Deploy.
+
+No environment variables, database, or external media service are required. All
+images and videos are committed to the repository, so nothing needs downloading.
+
+If Vercel does not pick up pnpm automatically, add
+`npm install --global pnpm@11.25.0` to the install command. The `packageManager`
+field in `package.json` pins pnpm 11.25.0 and `.nvmrc` pins Node.js 22.
+
+## Cloudflare Workers
+
+The static output also deploys to Cloudflare. The build still emits the Worker
+configuration alongside the static assets.
+
+1. In your Cloudflare account, create a Worker using the GitHub repository `sakshamfit/AA`.
 2. Select the `main` branch and the repository root as the working directory.
-3. Use Node.js 22.13 or newer and pnpm 11.25.0. The repository's `packageManager` field pins pnpm; `.nvmrc` selects Node.js 22.
-4. Use these commands:
+3. Use Node.js 22.13 or newer and pnpm 11.25.0.
 
 | Setting | Value |
 | --- | --- |
@@ -15,40 +54,51 @@ The current application uses React, Vinext/Vite and Three.js. It builds to a Clo
 | Build command | `pnpm build` |
 | Deploy command | `pnpm exec wrangler deploy --config dist/server/wrangler.json --name allu-arjun-cinematic` |
 
-If the build environment does not provide pnpm, install it with `npm install --global pnpm@11.25.0` before the dependency step. No application environment variables, database, or external media service are needed.
-
 ## Deploy from a terminal
 
 ```sh
 npm install --global pnpm@11.25.0
 pnpm install --frozen-lockfile
-pnpm typecheck
-pnpm exec wrangler login
-pnpm deploy
+pnpm build
 ```
 
-`pnpm deploy` runs the build followed by Wrangler's deployment command. Wrangler prints the published URL. Change the `--name` value in `package.json` if you want a different Worker name.
+Then deploy `dist/client` with the CLI of your host. For Vercel:
 
-For CI, configure Cloudflare authentication through the hosting provider's secret settings. Do not commit account tokens or `.env` files.
+```sh
+pnpm exec vercel deploy --prebuilt
+```
+
+For Cloudflare:
+
+```sh
+pnpm exec wrangler login
+pnpm exec wrangler deploy --config dist/server/wrangler.json --name allu-arjun-cinematic
+```
 
 ## Production output
 
-- `dist/server/wrangler.json`: generated deployment configuration.
-- `dist/server/index.js`: generated Worker entry point.
-- `dist/client/`: generated frontend files and all public assets, including the videos.
+- `dist/client/index.html`: the pre-rendered homepage.
+- `dist/client/404.html`: the pre-rendered not-found page.
+- `dist/client/_next/`: bundled JavaScript and CSS.
+- `dist/client/images/`, `dist/client/videos/`: all public assets, including the videos.
+- `dist/server/`: Worker entry point and generated configuration, used only by the Cloudflare path.
 
-Build output is regenerated and excluded from Git. Do not upload only `public/` or only `dist/client/`; this application also uses the Worker entry point.
-
-## Other hosting providers
-
-The repository currently targets Cloudflare Workers. It is not configured as a standard Next.js deployment for Vercel or as a GitHub Pages static site. Adapting to another provider requires changing the build/deployment target; the existing Cloudflare configuration is ready to use as described above.
+Build output is regenerated and excluded from Git.
 
 ## Checking before deployment
 
 ```sh
 pnpm typecheck
 pnpm build
-pnpm start
 ```
 
-Open the local production URL printed by Wrangler. Check the mobile menu, scroll through the film scenes, and confirm muted autoplay. All images, geometry and videos are committed locally in this repository.
+To preview the exact static output Vercel will serve:
+
+```sh
+pnpm build
+python3 -m http.server 8080 --directory dist/client
+```
+
+Open http://localhost:8080. Check the mobile menu, scroll through the film scenes,
+and confirm muted autoplay. All images, geometry and videos are committed locally
+in this repository.
