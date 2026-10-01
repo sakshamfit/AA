@@ -551,5 +551,48 @@
         "file": "public/videos/ala-vaikunthapurramuloo-hd-loop.mp4"
       }
     ]
+  },
+  "soundtrack": {
+    "note": "The 2016 Sarrainodu album recording is owned by Lahari Music (Super Cassettes Industries) and no licensed copy is available, so no film audio is bundled or streamed. The site instead plays an original eight-bar anthem loop composed for this project and synthesised in the browser by app/soundtrack.ts.",
+    "composition": {
+      "title": "Sarrainodu anthem loop",
+      "file": "generated at runtime — no audio asset is shipped",
+      "authors": "Composed and programmed for this repository (original work)",
+      "key": "D Phrygian dominant",
+      "tempo_bpm": 104,
+      "bars": 8,
+      "loop_seconds": 18.46,
+      "layers": [
+        "kick",
+        "dhol",
+        "clap",
+        "hats",
+        "shaker",
+        "bass",
+        "brass stabs",
+        "reed lead",
+        "pad",
+        "ghungroo bells",
+        "crowd"
+      ],
+      "rendering": "OfflineAudioContext, peak-normalised to 0.94 FS, reverb tail folded onto the head for a seam-free repeat",
+      "similarity": "Style only. No melody, hook, lyric or recording from Sarrainodu or any other film is reproduced."
+    },
+    "reference_credits": {
+      "film": "Sarrainodu (2016), directed by Boyapati Srinu, music by S. Thaman, label Lahari Music",
+      "purpose": "Named as the visual/thematic inspiration for the site's Sarrainodu scene only."
+    },
+    "licensed_swap": {
+      "path": "public/audio/sarrainodu.mp3",
+      "behaviour": "app/sound-bridge.tsx probes this URL once per load with HEAD; when a real audio file is published it becomes the soundtrack (still autoplayed, still stopped from the bottom-left control).",
+      "status": "Not included — requires permission from the rights holder."
+    },
+    "verified": {
+      "peak": 0.94,
+      "clipped_samples": 0,
+      "dc_offset": 0.0,
+      "loop_seam_delta": 0.00135,
+      "method": "Rendered headlessly through a Web Audio implementation and measured; autoplay/stop state machine covered by a scripted controller harness."
+    }
   }
 }
