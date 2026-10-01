@@ -5,6 +5,7 @@ import {ArrowUpRight,ArrowDown,Menu} from "lucide-react";
 import {Dialog,DialogContent,DialogTitle,DialogDescription} from "@/components/ui/dialog";
 import Sculpture from "./sculpture";
 import FilmLoop from "./film-loop";
+import SoundBridge from "./sound-bridge";
 import {DURATION,clamp,range,windowFade,motionState,smooth} from "./motion";
 const signature="M63 257 145 49 156 254 42 164H323 M179 257 242 49 283 257";
 function Signature({className=""}:{className?:string}){return <svg className={className} viewBox="25 25 320 260" role="img" aria-label="Allu Arjun AA signature"><path d={signature} stroke="currentColor" strokeWidth="7" strokeLinejoin="miter" fill="none"/></svg>}
@@ -77,6 +78,8 @@ export default function Home(){
   <div className="scene-counter" aria-hidden="true">{String(active+1).padStart(2,"0")} — 05</div>
   <div className="material-control"><div className="axis" aria-hidden="true"><i/><i/><i/><b>X</b><b>Y</b><b>Z</b></div><div className="swatches">{["chrome","iridescent"].map(m=><button key={m} aria-label={`${m} material`} aria-pressed={finish===m} className={`${m} ${finish===m?"selected":""}`} onClick={()=>{setFinish(m);motionState.material=m;}}/>)}</div></div>
  </main>
+ {/* Mounted outside .experience so its fixed corner placement ignores the 3D perspective container. */}
+ <SoundBridge ducked={menu}/>
  <Dialog open={menu} onOpenChange={setMenu}><DialogContent className="nav-dialog"><DialogTitle className="sr-only">Explore Allu Arjun</DialogTitle><DialogDescription className="sr-only">Jump to a scene</DialogDescription><Signature/>{nav.map((n,i)=><button onClick={()=>go(n.s)} key={n.label}><span>0{i+1}</span>{n.label}<ArrowUpRight/></button>)}</DialogContent></Dialog>
  </>;
 }

@@ -49,6 +49,8 @@ The deploy command builds the project and deploys `dist/server/wrangler.json` un
 | `app/aa-shape.json` | AA geometry; generator in `scripts/build-aa-geometry.mjs` |
 | `app/motion.ts` | Shared animation state |
 | `app/film-loop.tsx` | Muted autoplay and scene-aware playback |
+| `app/soundtrack.ts` | Sarrainodu anthem: composition, synth voices, offline render, playback controller |
+| `app/sound-bridge.tsx` | Autoplay attempt, bottom-left Stop control, volume slider |
 | `app/layout.tsx` | Page metadata and viewport settings |
 | `public/images/`, `public/videos/` | Locally hosted media |
 
@@ -57,6 +59,21 @@ Original UI components, build helpers and vendor license notices are included. `
 ## Automatic playback
 
 RAAKA, Pushpa 2, DJ, Sarrainodu, Ala Vaikunthapurramuloo, and Race Gurram each have their own silent loop. The DJ and Sarrainodu focus panels and the final Allu Arjun portrait also start automatically. No YouTube embed, play button, or resume switch is needed. Footage pauses while its scene is offscreen or the browser tab is hidden, then resumes automatically on return. Playback uses muted, inline H.264 MP4 for broad browser compatibility. Device-level autoplay restrictions can still override browser playback.
+
+## Sarrainodu soundtrack
+
+The site opens with music: an eight-bar *Sarrainodu* anthem loop (104 BPM) that starts automatically with the page and can be stopped from the dock pinned to the bottom-left corner.
+
+- `app/soundtrack.ts` composes and renders the loop with the Web Audio API — dhol, ketti-style reed lead, brass stabs, ghungroo bells, sub bass and a crowd bed. It is pre-rendered once in an `OfflineAudioContext`, so playback is a single looping buffer: no JS timers to glitch when a tab is backgrounded, and the reverb tail is folded onto the head so the repeat point is seamless.
+- The film's songs are owned by Lahari Music, so no film recording is bundled or streamed here. The loop is an original theme in the same mass-folk spirit — no melody, hook or recording from the film is reproduced.
+- Hold the rights to the real track? Publish it at `public/audio/sarrainodu.mp3` and the site detects it on load and plays that instead, with the same controls (see `public/audio/README.md`).
+
+`app/sound-bridge.tsx` owns the interface and the autoplay handshake:
+
+- **Corner dock, bottom-left.** Track name, live meter, volume slider and **STOP**. Stop fades out in 350 ms and releases the audio graph; the same button turns into PLAY to start again.
+- **Autoplay, honestly.** Browsers refuse unmuted audio before a visitor interacts with the page, so the site attempts playback immediately and, when that is refused, shows "TAP TO PLAY" and unlocks itself on the next click or key press — the music starts on its own as soon as the browser allows it rather than failing silently.
+- **Ducked, not drowned.** The music falls to a quarter of its level while the navigation sheet is open.
+
 
 Film configuration is in `app/page.tsx`; playback behavior is in `app/film-loop.tsx`; 3D rendering is in `app/sculpture.tsx`.
 
